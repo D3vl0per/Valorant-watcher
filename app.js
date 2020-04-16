@@ -1,120 +1,118 @@
 require('dotenv').config();
 const puppeteer = require('puppeteer');
 const dayjs = require('dayjs');
-const chromeLauncher = require('chrome-launcher');
 const cheerio = require('cheerio');
 var fs = require('fs');
-const inquirer  = require('./input');
+const inquirer = require('./input');
+const Nightmare = require('nightmare')
 
 var run = true;
-
-const streamersPath = './streamers.json';
+// ========================================== CONFIG SECTION =================================================================
 const configPath = './config.json'
-
 const baseUrl = 'https://www.twitch.tv/';
 const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36';
 const streamersUrl = 'https://www.twitch.tv/directory/game/VALORANT?tl=c2542d6d-cd10-4532-919b-3d19f30a768b';
 const scrollDelay = 2000;
 const scrollTimes = 5;
 
+const minWatching = 6; // Minutes
+const maxWatching = 10; //Minutes
+
+const streamerListRefresh = 2;
+const streamerListRefreshUnit = 'hour'; //https://day.js.org/docs/en/manipulate/add
+
+const showBrowser = false;
+// ========================================== CONFIG SECTION =================================================================
+
 (async () => {
-  console.clear();
-  console.log("=========================");
-  var browser;
-  if (process.env.exec) {
-    browser = await puppeteer.launch({ headless: true, executablePath: process.env.exec, ignoreDefaultArgs: ['--mute-audio'], args: ['--no-sandbox', '--disable-setuid-sandbox']});
-  } else {
-    browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--mute-audio']});
+  console.clear(); console.log("=========================");
+  const browserConfig = {
+    headless: !showBrowser,
+    ignoreDefaultArgs: ['--mute-audio']
   }
+
+  if (process.env.exec){
+    browserConfig.executablePath = process.env.exec;
+    browserConfig.args = new Array();
+    browserConfig.args[0] = '--no-sandbox';
+    browserConfig.args[1] = '--disable-setuid-sandbox';
+    if (process.env.proxy) {
+      browserConfig.args[2] = '--proxy-server=' + process.env.proxy;
+    }
+  }
+
+  browser = await puppeteer.launch(browserConfig);
   const page = await browser.newPage();
 
   console.log('🔧 Set User-Agent');
   await page.setUserAgent(userAgent);
 
-  var cookies = await readLoginData();
+  var cookie = await readLoginData();
   console.log('🔧 Set auth cookie');
-  await page.setCookie(...cookies);
+  await page.setCookie(...cookie);
+
   process.stdout.write('🔐 Checking login...  ');
   await checkLogin(page);
 
-  console.log("=========================");
-  console.log('📡 Check active streamers');
+
   let streamers = await getAllStreamer(page);
   console.log("=========================");
   console.log('📌 Run watcher');
-  await viewRandomPage(page, streamers)
 
+  await viewRandomPage(cookie, page, streamers)
   await browser.close();
 })();
 
 async function readLoginData() {
-  const cookie = [
-        {
-            "domain": ".twitch.tv",
-            "hostOnly": false,
-            "httpOnly": false,
-            "name": "auth-token",
-            "path": "/",
-            "sameSite": "no_restriction",
-            "secure": true,
-            "session": false,
-            "storeId": "0",
-            "id": 1
-        }
-    ];
+  const cookie = [{
+    "domain": ".twitch.tv",
+    "hostOnly": false,
+    "httpOnly": false,
+    "name": "auth-token",
+    "path": "/",
+    "sameSite": "no_restriction",
+    "secure": true,
+    "session": false,
+    "storeId": "0",
+    "id": 1
+  }];
   try {
     process.stdout.write('🔎 Check config file...  ');
 
     if (fs.existsSync(configPath)) {
       console.log('✅ Json config found');
       let configFile = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-      if (dayjs().format() > dayjs(configFile.expDate).unix()) {
-        console.log("🛑 Expired cookie, please login again!");
-        fs.unlinkSync(configPath);
-        process.exit();
-      }
-      else {
-          cookie[0].expirationDate = configFile.expDate;
-          cookie[0].value = configFile.token;
-          return cookie;
-      }
-    }
-    else if (process.env.token && process.env.date){
-      console.log('✅ Env config found');
-      if (dayjs().format() > dayjs(process.env.date).unix()) {
-        console.log("🛑 Expired cookie, please login again!");
-        process.exit();
-      }
-      else {
-        cookie[0].expirationDate = process.env.date;
-        cookie[0].value = process.env.token;
+        cookie[0].value = configFile.token;
         return cookie;
-      }
-    }
-    else {
+    } else if (process.env.token) {
+      console.log('✅ Env config found');
+      cookie[0].value = process.env.token;
+      return cookie;
+    } else {
       console.log('❌ Create config file');
       let input = await inquirer.askLogin();
-      input.expDate = dayjs(input.expDate.replace(/\s/g, ''));
       fs.writeFile(configPath, JSON.stringify(input), function(err) {
         if (err) {
-            console.log(err);
+          console.log(err);
         }
       });
 
-      cookie[0].expirationDate = input.expDate;
       cookie[0].value = input.token;
       return cookie;
     }
-  } catch(err) {
+  } catch (err) {
     console.error(err)
   }
 }
 
 async function getAllStreamer(page) {
+  console.log("=========================");
+  console.log('📡 Check active streamers');
   console.log('📨 Go to Twitch.tv');
   console.log('⏰ Waiting for loading...');
-
-  await page.goto(streamersUrl, {"waitUntil" : "networkidle0"});
+  await page.goto(streamersUrl, {
+    "waitUntil": "networkidle0"
+  });
   await scroll(page, scrollTimes);
 
   let bodyHTML = await page.evaluate(() => document.body.innerHTML);
@@ -130,10 +128,10 @@ async function getAllStreamer(page) {
   return streamers;
 }
 
-async function scroll(page,times) {
+async function scroll(page, times) {
   console.log('🔨 Emulate the scrolling...');
   for (var i = 0; i < times; i++) {
-    await page.evaluate(async(page) => {
+    await page.evaluate(async (page) => {
       var x = document.getElementsByClassName("scrollable-trigger__wrapper");
       x[0].scrollIntoView();
     });
@@ -141,45 +139,52 @@ async function scroll(page,times) {
   }
 }
 
-async function viewRandomPage(page, streamers) {
-  await page.setViewport({width: 1280, height: 1280});
-  var last_refresh = dayjs().add(2, 'hour');
+async function viewRandomPage(cookie, page, streamers) {
+  const nightmare = Nightmare({
+    show: showBrowser,
+    waitTimeout: maxWatching * 60000
+  })
+  await nightmare.goto(baseUrl);
+  await nightmare.cookies.set('auth-token', cookie[0].value);
+  var last_refresh = dayjs().add(streamerListRefresh, );
   while (run) {
-    if (dayjs(last_refresh).isBefore(dayjs())){
+    if (dayjs(last_refresh).isBefore(dayjs())) {
       streamers = await getAllStreamer(page);
     }
     let watch = streamers[getRandomInt(0, streamers.length)];
-    var sleep = getRandomInt(6,10)*60000;
+    var sleep = getRandomInt(minWatching, maxWatching) * 60000;
 
-    console.log('\n🔗 Streamer: ',baseUrl+watch);
-    await page.goto(baseUrl+watch);
-    console.log('💤 Sleep ' + sleep/60000 + ' minutes\n');
+    console.log('\n🔗 Streamer: ', baseUrl + watch);
+    await nightmare.goto(baseUrl + watch);
+    console.log('💤 Watching for ' + sleep / 60000 + ' minutes\n');
 
-    await page.waitFor(sleep);
+    await nightmare.wait(sleep);
   }
 }
 
 async function checkLogin(page) {
-    await page.goto(baseUrl, {"waitUntil" : "networkidle0"});
-    let cookieSetByServer = await page.cookies();
-    for (var i = 0; i < cookieSetByServer.length; i++) {
-      if (cookieSetByServer[i].name == 'twilight-user'){
-        console.log('✅ Login successful');
-        return true;
-      }
+  await page.goto(baseUrl, {
+    "waitUntil": "networkidle0"
+  });
+  let cookieSetByServer = await page.cookies();
+  for (var i = 0; i < cookieSetByServer.length; i++) {
+    if (cookieSetByServer[i].name == 'twilight-user') {
+      console.log('✅ Login successful');
+      return true;
     }
-    console.log('\n🛑 Login failed!');
-    console.log('🔑 Wrong token!');
-    if (!process.env.token){
-      fs.unlinkSync(configPath);
-    }
-    process.exit()
+  }
+  console.log('\n🛑 Login failed!');
+  console.log('🔑 Wrong token!');
+  if (!process.env.token) {
+    fs.unlinkSync(configPath);
+  }
+  process.exit()
 }
 
 function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 async function shutDown() {

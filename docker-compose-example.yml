@@ -5,5 +5,4 @@ services:
     restart: always
     environment:
       - token=rxk38rh5qtyw95fkvm7kgfceh4mh6u #Example value from readme
-      - date=2020-04-13T22:22:22.010Z #Example value from readme
       - exec=/usr/bin/chromium-browser #Chromium executable, do not replace

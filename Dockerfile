@@ -1,4 +1,4 @@
-FROM node:13.12.0-alpine3.10
+FROM quay.io/ivanvanderbyl/docker-nightmare:latest
 WORKDIR /usr/src/app
 COPY . .
 RUN mv docker-package.json package.json

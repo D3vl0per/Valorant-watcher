@@ -46,8 +46,7 @@
 ## Troubleshooting
 
 ### How token does it look like?
-auth-token: `rxk38rh5qtyw95fkvm7kgfceh4mh6u`  
-expire date: `2020-04-13T22:22:22.010Z`  
+auth-token: `rxk38rh5qtyw95fkvm7kgfceh4mh6u`
 ___
 
 ### Setting Up Chrome Linux Sandbox
