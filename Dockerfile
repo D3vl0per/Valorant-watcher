@@ -1,7 +1,6 @@
 FROM node:13.12.0-alpine3.10
 WORKDIR /usr/src/app
 COPY . .
-RUN mv docker-package.json package.json
 RUN npm install
 
 # Installs latest Chromium (77) package.
