@@ -1,4 +1,6 @@
 
+
+
 <h1 align="center">Valorant watcher</h1>
 <p align="center"> I spent two days watching Valorant streams to get a drop. I got bored...</p>
 <p align="center">
@@ -9,21 +11,26 @@
 
 ## Requirements
 
- - Windows or Linux OS
+ - ~~Windows~~ or Linux OS
  - Network connection (So obvious...)
  - [Nodejs](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm)
- - [screen](https://linuxize.com/post/how-to-use-linux-screen/) (Optional, just for background running)
 
 
 ## Installation
+**!! Working only desktop environment, therefore use my docker image!!**
 
+### Windows
+Someone please test it 🙁
+### Linux
 1. Login your twitch account
 2. Open inspector(F12 or Ctlr+Shift+I) on main site
 3. Find stored cookie section
-4. Copy auth-token and the token's expires date
+4. Copy **auth-token**
 5. Clone this repo
-6. Install the dependencies with `npm install`
-7. After start the program with `npm start`
+6. Install chromium: [TUTORIAL 🤗](https://www.addictivetips.com/ubuntu-linux-tips/install-chromium-on-linux/)
+7. Locate chromium executable: `whereis chromium`
+8. Install the dependencies with `npm install`
+9. After start the program with `npm start`
 
 ## Docker
 <p align="center">
@@ -40,7 +47,7 @@
 4. Run `docker-compose up -d`
 ## Dependencies
 <p align="center">
-<img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/puppeteer"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/chrome-launcher"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/cheerio"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/inquirer"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dotenv">
+<img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/puppeteer-core"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/cheerio"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/inquirer"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dotenv"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dayjs">
 </p>
 
 ## Troubleshooting
@@ -59,7 +66,10 @@ If you **absolutely trust** the content you open in Chrome, you can launch Chrom
 with the `--no-sandbox` argument:
 
 ```js
-const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+var browserConfig = {
+    headless: !showBrowser,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+};
 ```
 
 > **NOTE**: Running without a sandbox is **strongly discouraged**. Consider configuring a sandbox instead.
@@ -113,11 +123,28 @@ ___
 ### Something went wrong?
 Try to non-headless mode. Edit headless value to `true`, like this:
 ```javascript
-const browser = await puppeteer.launch({ headless: true , ignoreDefaultArgs: ['--mute-audio']});
+const showBrowser = true;
+```
+___
+### Proxy?
+
+Yes, of course:
+```javascript
+const proxy = ""; // "ip:port" By https://github.com/Jan710
+```
+OR
+
+Docker env
+```
+proxy=
+```
+___
+### Screenshot without non-headless mode
+```javascript
+const browserScreenshot = false;
 ```
 ## Support
- - Keybase at [https://keybase.io/d3v_](https://keybase.io/d3v_) ![Keybase PGP](https://img.shields.io/keybase/pgp/d3v_)
- - Website at [https://zsmark.dev](https://zsmark.dev)
+ - Keybase at [https://keybase.io/d3v_](https://keybase.io/d3v_)
 ## Donations
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/D3v)
 
