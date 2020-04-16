@@ -21,7 +21,7 @@ const maxWatching = 10; //Minutes
 const streamerListRefresh = 2;
 const streamerListRefreshUnit = 'hour'; //https://day.js.org/docs/en/manipulate/add
 
-const showBrowser = true; // false state equ headless mode;
+const showBrowser = false; // false state equ headless mode;
 const proxy = ""; // "ip:port" By https://github.com/Jan710
 
 const browserScreenshot = false;
