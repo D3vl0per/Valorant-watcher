@@ -17,7 +17,6 @@
     "dayjs": "^1.8.24",
     "dotenv": "^8.2.0",
     "inquirer": "^7.1.0",
-    "nightmare": "^3.0.2",
     "puppeteer": "^1.19.0"
   }
 }
