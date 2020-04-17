@@ -50,8 +50,8 @@ var browserConfig = {
     await page.setCookie(...cookie);
 
     console.log('⏰ Setting timeouts');
-    await page.setDefaultNavigationTimeout(process.env.timeout);
-    await page.setDefaultTimeout(process.env.timeout);
+    await page.setDefaultNavigationTimeout(process.env.timeout || 30000);
+    await page.setDefaultTimeout(process.env.timeout || 30000);
 
     process.stdout.write('🔐 Checking login...  ');
     await checkLogin(page);
