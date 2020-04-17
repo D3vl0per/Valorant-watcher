@@ -6,3 +6,4 @@ services:
     environment:
       - token=rxk38rh5qtyw95fkvm7kgfceh4mh6u #Example value from readme
       - exec=/usr/bin/chromium-browser #Chromium executable, do not replace
+      - timeout=5000000 #Timeout for navigation calls
