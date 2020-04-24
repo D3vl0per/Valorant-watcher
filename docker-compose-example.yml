@@ -1,11 +1,12 @@
 version: '3.5'
 services:
   valorant-watcher:
+    #build: . #For local build
+    #image: valorant-watcher:latest #For local build
     image: d3vm/valorant-watcher:latest
     restart: always
     environment:
       - token=rxk38rh5qtyw95fkvm7kgfceh4mh6u #Example value from readme
-      - timeout=5000000 #Timeout for navigation calls
       #- userAgent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36
       #- scrollDelay=2000
       #- scrollTimes=5
@@ -14,5 +15,7 @@ services:
       #- streamerListRefres=2
       #- streamerListRefreshUnit=hour
       #- browserScreenshot=false
+      #- proxy=ip:port
+      #- proxyAuth=username:password
     #volumes:
     #  - "./screenshots:/usr/src/app/screenshots"

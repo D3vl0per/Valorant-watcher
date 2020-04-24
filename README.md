@@ -11,7 +11,7 @@
 
 ## Requirements
 
- - ~~Windows~~ or Linux OS
+ - Windows or Linux OS
  - Network connection (So obvious...)
  - [Nodejs](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm)
 
@@ -23,14 +23,24 @@
 - 🤐 Unmute stream
 - 🛠 Detect mature content based stream and interact it
 - 🛡 Proxy option
+- 📽 Auto lowest possible resolution settings
+- 🧰 Highly customizable codebase
 - 📦 Deployable to VPS by docker
+- 🏳️ Helpful support community
 
 
 ## Installation
-**!! Working only desktop environment, therefore use my docker image!!**
 
 ### Windows
-Someone please test it 🙁
+1. Login your twitch account
+2. Open inspector(F12 or Ctlr+Shift+I) on main site
+3. Find stored cookie section
+4. Copy **auth-token**
+5. Clone this repo
+6. Install chromium
+7. Usualy path to chromium executable: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
+8. Install the dependencies with `npm install`
+9. Start the program with `npm start`
 ### Linux
 1. Login your twitch account
 2. Open inspector(F12 or Ctlr+Shift+I) on main site
@@ -47,9 +57,12 @@ Someone please test it 🙁
 <img alt="Docker Image Version (latest by date)" src="https://img.shields.io/docker/v/d3vm/valorant-watcher"> <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/d3vm/valorant-watcher"> <img alt="Docker Image Size (latest by date)" src="https://img.shields.io/docker/image-size/d3vm/valorant-watcher">
 </p>
 
+
+>Docker is a set of platform as a service (PaaS) products that uses OS-level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries and configuration files. All containers are run by a single operating system kernel and therefore use fewer resources than virtual machines.
 ### Requirements
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker compose](https://docs.docker.com/compose/install/)
+
 ### Useage
 1. Download docker-compose-example.yml
 2. Rename docker-compose.yml
@@ -57,7 +70,7 @@ Someone please test it 🙁
 4. Run with `docker-compose up -d` command
 ## Dependencies
 <p align="center">
-<img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/puppeteer-core"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/cheerio"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/inquirer"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dotenv"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dayjs">
+<img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/puppeteer-core"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/cheerio"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/inquirer"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dotenv"> <img alt="GitHub package.json dependency version (subfolder of monorepo)" src="https://img.shields.io/github/package-json/dependency-version/D3vl0per/Valorant-watcher/dayjs"> <img alt="GitHub package.json dependency version (prod)" src="https://img.shields.io/github/package-json/dependency-version/d3vm/valorant-watcher/tree-kill">
 </p>
 
 ## Troubleshooting
@@ -66,62 +79,7 @@ Someone please test it 🙁
 auth-token: `rxk38rh5qtyw95fkvm7kgfceh4mh6u`
 ___
 
-### Setting Up Chrome Linux Sandbox
 
-In order to protect the host environment from untrusted web content, Chrome uses [multiple layers of sandboxing](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/linux_sandboxing.md). For this to work properly,
-the host should be configured first. If there's no good sandbox for Chrome to use, it will crash
-with the error `No usable sandbox!`.
-
-If you **absolutely trust** the content you open in Chrome, you can launch Chrome
-with the `--no-sandbox` argument:
-
-```js
-var browserConfig = {
-    headless: !showBrowser,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-};
-```
-
-> **NOTE**: Running without a sandbox is **strongly discouraged**. Consider configuring a sandbox instead.
-
-There are 2 ways to configure a sandbox in Chromium.
-
-### [recommended] Enable [user namespace cloning](http://man7.org/linux/man-pages/man7/user_namespaces.7.html)
-
-User namespace cloning is only supported by modern kernels. Unprivileged user namespaces are generally fine to enable,
-but in some cases they open up more kernel attack surface for (unsandboxed) non-root processes to elevate to
-kernel privileges.
-
-```bash
-sudo sysctl -w kernel.unprivileged_userns_clone=1
-```
-
-### [alternative] Setup [setuid sandbox](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/linux_suid_sandbox_development.md)
-
-The setuid sandbox comes as a standalone executable and is located next to the Chromium that Puppeteer downloads. It is
-fine to re-use the same sandbox executable for different Chromium versions, so the following could be
-done only once per host environment:
-
-```bash
-# cd to the downloaded instance
-cd <project-dir-path>/node_modules/puppeteer/.local-chromium/linux-<revision>/chrome-linux/
-sudo chown root:root chrome_sandbox
-sudo chmod 4755 chrome_sandbox
-# copy sandbox executable to a shared location
-sudo cp -p chrome_sandbox /usr/local/sbin/chrome-devel-sandbox
-# export CHROME_DEVEL_SANDBOX env variable
-export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
-```
-
-You might want to export the `CHROME_DEVEL_SANDBOX` env variable by default. In this case, add the following to the `~/.bashrc`
-or `.zshenv`:
-
-```bash
-export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
-```
-
-By puppeteer wiki: [https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md](https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md)
-___
 ### streamers.json is empty?
 
 Try to again with higher delay.
@@ -158,11 +116,18 @@ ___
 const browserScreenshot = false;
 ```
 [Go to code](https://github.com/D3vl0per/Valorant-watcher/blob/12dce8065423861971b7088563ad936b2dcc2559/app.js#L27)
+
+## Donation
+Please donate to keep alive this project!
+
+Especially the drop farmers who gather tons of money with this software!🤓  
+
+<style>.bmc-button img{height: 34px !important;width: 35px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button{padding: 7px 10px 7px 10px !important;line-height: 35px !important;height:51px !important;min-width:217px !important;text-decoration: none !important;display:inline-flex !important;color:#FFFFFF !important;background-color:#FF813F !important;border-radius: 5px !important;border: 1px solid transparent !important;padding: 7px 10px 7px 10px !important;font-size: 22px !important;letter-spacing: 0.6px !important;box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;margin: 0 auto !important;font-family:'Cookie', cursive !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;-o-transition: 0.3s all linear !important;-webkit-transition: 0.3s all linear !important;-moz-transition: 0.3s all linear !important;-ms-transition: 0.3s all linear !important;transition: 0.3s all linear !important;}.bmc-button:hover, .bmc-button:active, .bmc-button:focus {-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;text-decoration: none !important;box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;opacity: 0.85 !important;color:#FFFFFF !important;}</style><link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/D3v"><img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:15px;font-size:28px !important;">Buy me a coffee</span></a>
+
+
 ## Support
  - Keybase at [https://keybase.io/d3v_](https://keybase.io/d3v_)
  - Discord at [https://discord.gg/s8AH4aZ](https://discord.gg/s8AH4aZ)
-## Donations
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/D3v)
 
 ## Disclaimer
 These codes for educational and research purposes only.  
