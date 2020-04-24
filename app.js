@@ -173,7 +173,8 @@ async function viewRandomPage(page, streamers) {
         console.log('\n🔗 Streamer: ', baseUrl + watch);
 
         await page.goto(baseUrl + watch, {
-            "waitUntil": "networkidle2"
+            waitUntil: "networkidle2",
+            timeout: 0
         });//https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagegobackoptions
 
         await clickWhenExist(page, matureContentQuery);//Click on accept button
