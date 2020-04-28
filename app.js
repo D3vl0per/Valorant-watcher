@@ -81,7 +81,7 @@ async function viewRandomPage(browser, page) {
       let watch = streamers[getRandomInt(0, streamers.length - 1)]; //https://github.com/D3vl0per/Valorant-watcher/issues/27
       var sleep = getRandomInt(minWatching, maxWatching) * 60000; //Set watuching timer
 
-      console.log('\n🔗 Streamer: ', baseUrl + watch);
+      console.log('\n🔗 Now watching streamer: ', baseUrl + watch);
 
       await page.goto(baseUrl + watch, {
         "waitUntil": "networkidle0"
@@ -91,7 +91,7 @@ async function viewRandomPage(browser, page) {
       await clickWhenExist(page, matureContentQuery); //Click on accept button
 
       if (firstRun) {
-        console.log('🔧 Set lowest possible resolution');
+        console.log('🔧 Setting lowest possible resolution..');
         await clickWhenExist(page, streamPauseQuery);
 
         await clickWhenExist(page, streamSettingsQuery);
@@ -131,14 +131,14 @@ async function viewRandomPage(browser, page) {
       let status = await queryOnWebsite(page, userStatusQuery); //status jQuery
       await clickWhenExist(page, sidebarQuery); //Close sidebar
 
-      console.log('💡 Your account status:', status[0].children[0].data);
+      console.log('💡 Account status:', status[0].children[0].data);
       console.log('🕒 Time: ' + dayjs().format('HH:mm:ss'));
-      console.log('💤 I\'ll watch this for ' + sleep / 60000 + ' minutes\n');
+      console.log('💤 Watching steam for ' + sleep / 60000 + ' minutes\n');
 
       await page.waitFor(sleep);
     } catch (e) {
-      console.log('🤬 Found an error: ', e);
-      console.log('Please visit my discord channel to solve this problem: https://discord.gg/s8AH4aZ');
+      console.log('🤬 Error: ', e);
+      console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
     }
   }
 }
@@ -159,10 +159,10 @@ async function readLoginData() {
     "id": 1
   }];
   try {
-    process.stdout.write('🔎 Check config file...  ');
+    console.log('🔎 Checking config file...');
 
     if (fs.existsSync(configPath)) {
-      console.log('✅ Json config found');
+      console.log('✅ Json config found!');
 
       let configFile = JSON.parse(fs.readFileSync(configPath, 'utf8'))
 
@@ -180,7 +180,7 @@ async function readLoginData() {
 
       return cookie;
     } else {
-      console.log('❌ Create config file');
+      console.log('❌ No config file found!');
 
       let input = await inquirer.askLogin();
 
@@ -197,7 +197,7 @@ async function readLoginData() {
       return cookie;
     }
   } catch (err) {
-    console.log('🤬 Found an error: ', e);
+    console.log('🤬 Error: ', e);
     console.log('Please visit my discord channel to solve this problem: https://discord.gg/s8AH4aZ');
   }
 }
@@ -206,17 +206,17 @@ async function readLoginData() {
 
 async function spawnBrowser() {
   console.log("=========================");
-  console.log('📱 Spawn a browser');
+  console.log('📱 Launching browser...');
   var browser = await puppeteer.launch(browserConfig);
   var page = await browser.newPage();
 
-  console.log('🔧 Set User-Agent');
+  console.log('🔧 Setting User-Agent...');
   await page.setUserAgent(userAgent); //Set userAgent
 
-  console.log('🔧 Set auth cookie');
+  console.log('🔧 Setting auth token...');
   await page.setCookie(...cookie); //Set cookie
 
-  console.log('⏰ Setting timeouts');
+  console.log('⏰ Setting timeouts...');
   await page.setDefaultNavigationTimeout(process.env.timeout || 0);
   await page.setDefaultTimeout(process.env.timeout || 0);
 
@@ -239,15 +239,15 @@ async function getAllStreamer(page) {
   await page.goto(streamersUrl, {
     "waitUntil": "networkidle0"
   });
-  process.stdout.write('🔐 Checking login...  ');
+  console.log('🔐 Checking login...');
   await checkLogin(page);
-  console.log('📡 Check active streamers');
+  console.log('📡 Checking active streamers...');
   await scroll(page, scrollTimes);
   const jquery = await queryOnWebsite(page, channelsQuery);
   streamers = null;
   streamers = new Array();
 
-  console.log('🧹 Filter out html codes');
+  console.log('🧹 Filtering out html codes...');
   for (var i = 0; i < jquery.length; i++) {
     streamers[i] = jquery[i].attribs.href.split("/")[1];
   }
@@ -260,13 +260,13 @@ async function checkLogin(page) {
   let cookieSetByServer = await page.cookies();
   for (var i = 0; i < cookieSetByServer.length; i++) {
     if (cookieSetByServer[i].name == 'twilight-user') {
-      console.log('✅ Login successful');
+      console.log('✅ Login successful!');
       return true;
     }
   }
-  console.log('\n🛑 Login failed!');
+  console.log('🛑 Login failed!');
   console.log('🔑 Wrong token!');
-  console.log('https://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
+  console.log('Please see: https://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
   if (!process.env.token) {
     fs.unlinkSync(configPath);
   }
@@ -276,7 +276,7 @@ async function checkLogin(page) {
 
 
 async function scroll(page, times) {
-  console.log('🔨 Emulate the scrolling...');
+  console.log('🔨 Emulating scrolling...');
 
   for (var i = 0; i < times; i++) {
     await page.evaluate(async (page) => {
@@ -358,7 +358,7 @@ async function main() {
   } = await spawnBrowser();
   await getAllStreamer(page);
   console.log("=========================");
-  console.log('🔭 Run watcher');
+  console.log('🔭 Running watcher...');
   await viewRandomPage(browser, page);
 };
 
