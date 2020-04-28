@@ -131,9 +131,9 @@ async function viewRandomPage(browser, page) {
       let status = await queryOnWebsite(page, userStatusQuery); //status jQuery
       await clickWhenExist(page, sidebarQuery); //Close sidebar
 
-      console.log('💡 Account status:', status[0].children[0].data);
+      console.log('💡 Account status:', status[0] ? status[0].children[0].data : "Unknown");
       console.log('🕒 Time: ' + dayjs().format('HH:mm:ss'));
-      console.log('💤 Watching steam for ' + sleep / 60000 + ' minutes\n');
+      console.log('💤 Watching stream for ' + sleep / 60000 + ' minutes\n');
 
       await page.waitFor(sleep);
     } catch (e) {
