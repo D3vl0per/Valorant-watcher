@@ -265,8 +265,8 @@ async function checkLogin(page) {
     }
   }
   console.log('🛑 Login failed!');
-  console.log('🔑 Wrong token!');
-  console.log('Please see: https://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
+  console.log('🔑 Invalid token!');
+  console.log('Please insert a twitch auth-token: https://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
   if (!process.env.token) {
     fs.unlinkSync(configPath);
   }
