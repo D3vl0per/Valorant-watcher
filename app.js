@@ -266,7 +266,7 @@ async function checkLogin(page) {
   }
   console.log('🛑 Login failed!');
   console.log('🔑 Invalid token!');
-  console.log('Please insert a twitch auth-token: https://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
+  console.log('\nPleas ensure that you have a valid twitch auth-token.\nhttps://github.com/D3vl0per/Valorant-watcher#how-token-does-it-look-like');
   if (!process.env.token) {
     fs.unlinkSync(configPath);
   }
