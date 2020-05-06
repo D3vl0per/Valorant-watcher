@@ -9,8 +9,8 @@ const axios = require('axios')
 
 var run = true;
 var firstRun = true;
-var cookie = null;
-var streamers = [];
+var cookie;
+var streamers;
 var isDropped = false;
 // ========================================== CONFIG SECTION =================================================================
 const configPath = './config.json'
@@ -78,7 +78,7 @@ async function viewRandomPage(browser, page) {
         await checkDrop()
         if (isDropped){
             console.log('Valorant has been dropped') 
-            process.exit(0)
+           await shutDown()
         }
 
       if (dayjs(browser_last_refresh).isBefore(dayjs())) {
@@ -267,7 +267,6 @@ async function getAllStreamer(page) {
   for (var i = 0; i < jquery.length; i++) {
     streamers[i] = jquery[i].attribs.href.split("/")[1];
   }
-  return;
 }
 
 
