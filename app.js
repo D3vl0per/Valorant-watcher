@@ -262,7 +262,7 @@ async function getAllStreamer(page) {
   console.log('📡 Checking active streamers...');
   await scroll(page, scrollTimes);
   const jquery = await queryOnWebsite(page, channelsQuery);
-
+  streamers = []
   console.log('🧹 Filtering out html codes...');
   for (var i = 0; i < jquery.length; i++) {
     streamers[i] = jquery[i].attribs.href.split("/")[1];
