@@ -46,7 +46,7 @@
 4. Copy **auth-token**
 5. Clone this repo
 6. Install Chromium: [TUTORIAL 🤗](https://www.addictivetips.com/ubuntu-linux-tips/install-chromium-on-linux/)
-7. Locate Chromium executable: `whereis chromium`
+7. Locate Chromium executable: `whereis chromium` or `whereis chromium-browser`
 8. Install the dependencies with `npm install`
 9. Start the program with `npm start`
 
