@@ -19,7 +19,7 @@
 - 🧰 Ľahko-upravovateľný kód.
 - 📦 Možnosť deploynutia pomocou Dockera.
 - 🏳️ Nápomocná komunita.
-- 💬 Čítajma vo viacerých jazykoch: [🇫🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_FR.md) [🇧🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_PT.md) [🇷🇺 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_RU.md) [ꜱᴋ README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_SK.md)
+- 💬 Čítajma vo viacerých jazykoch: [🇫🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_FR.md) [🇧🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_PT.md) [🇷🇺 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_RU.md) [🇸🇰 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_SK.md)
 
 ## Požiadavky
 
