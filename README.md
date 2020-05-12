@@ -19,7 +19,7 @@
 - 🧰 Highly customizable codebase
 - 📦 Deployable to VPS by docker
 - 🏳️ Helpful support community
-- 💬 Multi language readme: [🇫🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_FR.md) [🇧🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_PT.md) [🇷🇺 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_RU.md)
+- 💬 Multi language readme: [🇫🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_FR.md) [🇧🇷 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_PT.md) [🇷🇺 README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_RU.md) [ꜱᴋ README](https://github.com/D3vl0per/Valorant-watcher/blob/languages/README_SK.md)
 
 ## Requirements
 
