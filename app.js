@@ -10,12 +10,19 @@ var run = true;
 var firstRun = true;
 var cookie = null;
 var streamers = null;
+var PreviousChannelName = null;
+
 // ========================================== CONFIG SECTION =================================================================
 const configPath = './config.json'
 const screenshotFolder = './screenshots/';
 const baseUrl = 'https://www.twitch.tv/';
 const userAgent = (process.env.userAgent || 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
 const streamersUrl = (process.env.streamersUrl || 'https://www.twitch.tv/directory/game/VALORANT?tl=c2542d6d-cd10-4532-919b-3d19f30a768b');
+const ChannelName_1 = (process.env.ChannelName_1 || 'NoValueSet');
+const ChannelName_2 = (process.env.ChannelName_2 || 'NoValueSet');
+const ChannelName_3 = (process.env.ChannelName_3 || 'NoValueSet');
+const IgnoreRandomChannels = (process.env.IgnoreRandomChannels || FALSE );
+
 
 const scrollDelay = (Number(process.env.scrollDelay) || 2000);
 const scrollTimes = (Number(process.env.scrollTimes) || 5);
@@ -61,90 +68,194 @@ const streamQualityQuery = 'input[data-a-target="tw-radio"]';
 
 
 
-async function viewRandomPage(browser, page) {
+async function ViewPriority(browser,page) {
   var streamer_last_refresh = dayjs().add(streamerListRefresh, streamerListRefreshUnit);
   var browser_last_refresh = dayjs().add(browserClean, browserCleanUnit);
+  var RefreshAvailable = true;
+  var ForceRefresh = true;
+
   while (run) {
     try {
-      if (dayjs(browser_last_refresh).isBefore(dayjs())) {
+      //Check to refresh the browser -> Based on time and if watching randoms vs high-priority streams
+      if ( ForceRefresh || RefreshAvailable && dayjs(browser_last_refresh).isBefore(dayjs())) {
         var newSpawn = await cleanup(browser, page);
         browser = newSpawn.browser;
         page = newSpawn.page;
         firstRun = true;
+        PreviousChannelName = null; //Reset the Previous Channel Name to ensure that it will navigate on the next selection
+        RefreshAvailable = false;   //After browser has been reset, ignore refreshing until you are sure that it is watching randoms instead of the high priority streams.
+        ForceRefresh = false;       //Set the value to false to avoid refreshing it every loop
         browser_last_refresh = dayjs().add(browserClean, browserCleanUnit);
       }
 
-      if (dayjs(streamer_last_refresh).isBefore(dayjs())) {
-        await getAllStreamer(page); //Call getAllStreamer function and refresh the list
-        streamer_last_refresh = dayjs().add(streamerListRefresh, streamerListRefreshUnit); //https://github.com/D3vl0per/Valorant-watcher/issues/25
+      // Check each stream in the priority list to determine which one to watch
+      if ( CheckStreamerOnline(ChannelName_1) ) {         //View First Priority Channel
+          var { firstRun } = await ViewURL(page, ChannelName_1, minWatching, firstRun);
+      
+      } else if ( CheckStreamerOnline(ChannelName_2) ) {  //View Second Priority Channel
+          var { firstRun } = await ViewURL(page, ChannelName_2, minWatching, firstRun);
+
+      } else if ( CheckStreamerOnline(ChannelName_3) ) {  //View Third Priority Channel
+          var { firstRun } = await ViewURL(page, ChannelName_3, minWatching, firstRun);
+
+      } else if ( IgnoreRandomChannels == TRUE ) { // Don't bother viewing random pages, instead just sit idle until a desired channel comes online
+            RefreshAvailable = true ;
+            if (firstRun == FALSE ){ 
+              ForceRefresh = true; // Force a refresh if no channels available and have not done one yet (Save Resources)
+            
+            } else {  // Sitting Idle
+              var sleep = 2;
+              console.log('-- No Stream Available -> Sleeping for ' + sleep + ' minutes\n');
+              await page.waitFor(sleep * 60000); //Sleep for X minutes
+            }
+
+      } else { // View Random Page & reset the browser if needed
+        RefreshAvailable = true;  
+        var { firstRun } = await viewRandomPage(page, firstrun);
       }
 
-      let watch = streamers[getRandomInt(0, streamers.length - 1)]; //https://github.com/D3vl0per/Valorant-watcher/issues/27
-      var sleep = getRandomInt(minWatching, maxWatching) * 60000; //Set watuching timer
-
-      console.log('\n🔗 Now watching streamer: ', baseUrl + watch);
-
-      await page.goto(baseUrl + watch, {
-        "waitUntil": "networkidle0"
-      }); //https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagegobackoptions
-
-      await clickWhenExist(page, cookiePolicyQuery);
-      await clickWhenExist(page, matureContentQuery); //Click on accept button
-
-      if (firstRun) {
-        console.log('🔧 Setting lowest possible resolution..');
-        await clickWhenExist(page, streamPauseQuery);
-
-        await clickWhenExist(page, streamSettingsQuery);
-        await page.waitFor(streamQualitySettingQuery);
-
-        await clickWhenExist(page, streamQualitySettingQuery);
-        await page.waitFor(streamQualityQuery);
-
-        var resolution = await queryOnWebsite(page, streamQualityQuery);
-        resolution = resolution[resolution.length - 1].attribs.id;
-        await page.evaluate((resolution) => {
-          document.getElementById(resolution).click();
-        }, resolution);
-
-        await clickWhenExist(page, streamPauseQuery);
-
-        await page.keyboard.press('m'); //For unmute
-        firstRun = false;
-      }
-
-
-      if (browserScreenshot) {
-        await page.waitFor(1000);
-        fs.access(screenshotFolder, error => {
-          if (error) {
-            fs.promises.mkdir(screenshotFolder);
-          }
-        });
-        await page.screenshot({
-          path: `${screenshotFolder}${watch}.png`
-        });
-        console.log('📸 Screenshot created: ' + `${watch}.png`);
-      }
-
-      await clickWhenExist(page, sidebarQuery); //Open sidebar
-      await page.waitFor(userStatusQuery); //Waiting for sidebar
-      let status = await queryOnWebsite(page, userStatusQuery); //status jQuery
-      await clickWhenExist(page, sidebarQuery); //Close sidebar
-
-      console.log('💡 Account status:', status[0] ? status[0].children[0].data : "Unknown");
-      console.log('🕒 Time: ' + dayjs().format('HH:mm:ss'));
-      console.log('💤 Watching stream for ' + sleep / 60000 + ' minutes\n');
-
-      await page.waitFor(sleep);
     } catch (e) {
-      console.log('🤬 Error: ', e);
-      console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
+        console.log('🤬 Error: ', e);
+        console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
     }
   }
 }
 
 
+async function ViewURL(page, ChannelURL, SleepTimer, firstRun){
+  try {
+    
+    if ( PreviousChannelName === ChannelURL ) {
+      //Page should already be on this channel, so no need to move to it.
+
+    }else {
+      console.log('\n🔗 Now watching streamer: ', baseUrl + ChannelURL);
+      await page.goto(baseUrl + ChannelURL, {
+        "waitUntil": "networkidle0"
+      }); //https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagegobackoptions
+      PreviousChannelName = ChannelURL;  // Store the ChannelURL to avoid refreshing the page if already on this page.
+    }
+
+    await clickWhenExist(page, cookiePolicyQuery);  
+    await clickWhenExist(page, matureContentQuery); //Click on accept button
+
+    if (firstRun) {
+      console.log('🔧 Setting lowest possible resolution..');
+      await clickWhenExist(page, streamPauseQuery);
+
+      await clickWhenExist(page, streamSettingsQuery);
+      await page.waitFor(streamQualitySettingQuery);
+
+      await clickWhenExist(page, streamQualitySettingQuery);
+      await page.waitFor(streamQualityQuery);
+
+      var resolution = await queryOnWebsite(page, streamQualityQuery);
+      resolution = resolution[resolution.length - 1].attribs.id;
+      await page.evaluate((resolution) => {
+        document.getElementById(resolution).click();
+      }, resolution);
+
+      await clickWhenExist(page, streamPauseQuery);
+
+      await page.keyboard.press('m'); //For unmute
+      var firstRunRet = false;
+    }
+
+
+    if (browserScreenshot) {
+      await page.waitFor(1000);
+      fs.access(screenshotFolder, error => {
+        if (error) {
+          fs.promises.mkdir(screenshotFolder);
+        }
+      });
+      await page.screenshot({
+        path: `${screenshotFolder}${ChannelURL}.png`
+      });
+      console.log('📸 Screenshot created: ' + `${ChannelURL}.png`);
+    }
+
+    await clickWhenExist(page, sidebarQuery); //Open sidebar
+    await page.waitFor(userStatusQuery); //Waiting for sidebar
+    let status = await queryOnWebsite(page, userStatusQuery); //status jQuery
+    await clickWhenExist(page, sidebarQuery); //Close sidebar
+
+    console.log('💡 Account status:', status[0] ? status[0].children[0].data : "Unknown");
+    console.log('🕒 Time: ' + dayjs().format('HH:mm:ss'));
+    
+    //Sleep Timer
+    console.log('💤 Watching stream for ' + SleepTimer + ' minutes\n');
+    await SleepWatching(SleepTimer, ChannelURL) //Scan for higher priority channels while watching this stream
+    
+    return firstRunRet;
+
+  } catch (e) {
+    console.log('🤬 Error: ', e);
+    console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
+  }
+}
+
+async function viewRandomPage(page, firstRun) {  
+    try {
+      //Check to refresh the streamer list
+      if (dayjs(streamer_last_refresh).isBefore(dayjs())) {
+        await getAllStreamer(page); //Call getAllStreamer function and refresh the list
+        streamer_last_refresh = dayjs().add(streamerListRefresh, streamerListRefreshUnit); //https://github.com/D3vl0per/Valorant-watcher/issues/25
+      }
+
+      // Pick a stream, get a random sleep timer, and attempt to view the stream
+      let watch = streamers[getRandomInt(0, streamers.length - 1)]; //https://github.com/D3vl0per/Valorant-watcher/issues/27
+      var SleepTimer = getRandomInt(minWatching, maxWatching); //Set watching timer
+      var { firstRunRet } = await ViewURL(page, watch, SleepTimer, firstRun);
+      return firstRunRet;
+
+    } catch (e) {
+      console.log('🤬 Error: ', e);
+      console.log('Please visit the discord channel to receive help: https://discord.gg/s8AH4aZ');
+    }
+  
+}
+
+async function SleepWatching(MaxSleepTimer, ChannelURL) {
+  var i = 0;
+  var Ch1 = CheckStreamerOnline(ChannelName_1);
+  var Ch2 = CheckStreamerOnline(ChannelName_2);
+  var Ch3 = CheckStreamerOnline(ChannelName_3);
+
+  do {
+    if ( ( ChannelURL ===  ChannelName_2 || ChannelURL === ChannelName_3 ) && Ch1 ) { //Channel 1 is LIVE while viewing Channel 2 / 3
+      i = MaxSleepTimer + 1
+
+    } else if ( ChannelURL === ChannelName_3  && Ch2 ) { //Channel 2 is LIVE while viewing Channel 3
+      i = MaxSleepTimer + 1
+
+    } else if ( ChannelURL === ChannelName_3 ) {    // Watching Channel 3
+
+    } else if (  Ch1 || Ch2 || Ch3 ) {  //Atleast 1 high priority stream is online -> Set i to the MaxTimer in order to exit the sleep loop
+      i = MaxSleepTimer + 1
+      
+    } else {  // No High Priority streamer is online -> Sleep for 1 minute
+      i = i + 1
+      await page.waitFor(60000); 
+    }    
+
+  } while (i < MaxSleepTimer);
+  
+}
+
+async function CheckStreamerOnline(ChannelURL) {
+  var bolONLINE = false;
+  if (ChannelURL ===  'NoValueSet' || ChannelURL ===  '' || ChannelURL ==  null ) {  
+      // No Value -> Ignore
+      bolOnline = false; 
+
+  } else { //Perform some check to determine if the specic chnannel is online
+
+
+  }
+
+  return bolONLINE
+}
 
 async function readLoginData() {
   const cookie = [{
@@ -348,7 +459,6 @@ async function shutDown() {
 }
 
 
-
 async function main() {
   console.clear();
   console.log("=========================");
@@ -360,7 +470,7 @@ async function main() {
   await getAllStreamer(page);
   console.log("=========================");
   console.log('🔭 Running watcher...');
-  await viewRandomPage(browser, page);
+  await ViewPriority(browser, page);
 };
 
 main();
