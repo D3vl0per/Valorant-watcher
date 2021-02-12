@@ -28,17 +28,26 @@
  - [Nodejs](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm)
  
 ## Installation
-🎥 [Tutorial video by Ziyad](https://youtu.be/bwzv7wT44Ds) 🎥
+🎥 [Tutorial video by Ziyad](https://youtu.be/bwzv7wT44Ds) 🎥 [currently unavailable]
 ### Windows
-1. Login to your twitch account
-2. Open inspector(F12 or Ctrl+Shift+I) on main site
-3. Find the stored cookie section
-4. Copy **auth-token**
-5. Clone this repo
-6. Install Chromium
-7. Usually the path to the Chromium executable is: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
-8. Install the dependencies with `npm install`
-9. Start the program with `npm start`
+1. Login to your twitch account (www.twitch.tv)
+2. Open inspector(F12 or Ctrl+Shift+I or right click and select 'inspect') on main site
+3. Find the stored cookie section (in the inspect window go to Application > Storage > Cookies > https://www.twitch.tv)
+4. Copy **auth-token** (and temporarily save it in a notepad)
+5. Clone this repo (using git, or download the ZIP using https://github.com/D3vl0per/Twitch-watcher/archive/master.zip)
+6. extract the content and copy the folder to where you would like to keep it
+7. install Chromium
+7.1. Download and install Chromium (latest version) (from https://download-chromium.appspot.com/)
+7.1.1. Extract the content of the chromium ZIP and copy the folder to where you would like to keep it (and note the path temporarily on a notepad)
+7.2. Or download chrome canary (stable version) (from https://www.google.com/intl/en/chrome/canary/)
+7.2.1. Usually the path to the Chromium executable is: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
+8. Install NODE.js (from https://nodejs.org/en/download/)
+9. go to the location where Valorant-watcher is located (step 6)
+10. right click anywhere inside the folder (NOT on a file) and select 'Open Command Prompt Here'
+11. Install the dependencies with `npm install` in the command prompt window
+12. Start the program with `npm start` in the command prompt window
+13. you will be prompted to enter your twitch token and chromium path.
+
 ### Linux
 1. Login to your twitch account
 2. Open inspector(F12 or Ctrl+Shift+I) on main site
