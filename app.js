@@ -5,11 +5,13 @@ const cheerio = require('cheerio');
 var fs = require('fs');
 const inquirer = require('./input');
 const treekill = require('tree-kill');
+const axios = require('axios')
 
 var run = true;
 var firstRun = true;
-var cookie = null;
-var streamers = null;
+var cookie;
+var streamers;
+var isDropped = false;
 // ========================================== CONFIG SECTION =================================================================
 const configPath = './config.json'
 const screenshotFolder = './screenshots/';
@@ -60,15 +62,28 @@ const streamPauseQuery = 'button[data-a-target="player-play-pause-button"]';
 const streamSettingsQuery = '[data-a-target="player-settings-button"]';
 const streamQualitySettingQuery = '[data-a-target="player-settings-menu-item-quality"]';
 const streamQualityQuery = 'input[data-a-target="tw-radio"]';
+const listNotificationRaw = '{"operationName":"OnsiteNotifications_ListNotifications","variables":{"limit":3,"cursor":"","language":"en"},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"b317b93ed481bf07c35defbcf01848f09744805ebb640734763298f9a7dfd64f"}}}'
 // ========================================== CONFIG SECTION =================================================================
 
-
+async function checkDrop(){
+    await axios.post('https://gql.twitch.tv/gql', listNotificationRaw, {headers: { Authorization: "OAuth " + cookie[0].value }}).then(
+        response=>{
+            isDropped = JSON.stringify(response.data.data.currentUser.notifications.edges).includes('You just received the **VALORANT**')
+        }
+    )
+}
 
 async function viewRandomPage(browser, page) {
   var streamer_last_refresh = dayjs().add(streamerListRefresh, streamerListRefreshUnit);
   var browser_last_refresh = dayjs().add(browserClean, browserCleanUnit);
   while (run) {
     try {
+        await checkDrop()
+        if (isDropped){
+            console.log('Valorant has been dropped') 
+           await shutDown()
+        }
+
       if (dayjs(browser_last_refresh).isBefore(dayjs())) {
         var newSpawn = await cleanup(browser, page);
         browser = newSpawn.browser;
@@ -76,6 +91,8 @@ async function viewRandomPage(browser, page) {
         firstRun = true;
         browser_last_refresh = dayjs().add(browserClean, browserCleanUnit);
       }
+
+
 
       if (dayjs(streamer_last_refresh).isBefore(dayjs())) {
         await getAllStreamer(page); //Call getAllStreamer function and refresh the list
@@ -263,14 +280,11 @@ async function getAllStreamer(page) {
   console.log('📡 Checking active streamers...');
   await scroll(page, scrollTimes);
   const jquery = await queryOnWebsite(page, channelsQuery);
-  streamers = null;
-  streamers = new Array();
-
+  streamers = []
   console.log('🧹 Filtering out html codes...');
   for (var i = 0; i < jquery.length; i++) {
     streamers[i] = jquery[i].attribs.href.split("/")[1];
   }
-  return;
 }
 
 
