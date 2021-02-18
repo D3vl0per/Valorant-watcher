@@ -37,10 +37,10 @@
 5. Clone this repo (using git, or download the ZIP using https://github.com/D3vl0per/Twitch-watcher/archive/master.zip)
 6. extract the content and copy the folder to where you would like to keep it
 7. install Chromium
-7.1. Download and install Chromium (latest version) (from https://download-chromium.appspot.com/)
-7.1.1. Extract the content of the chromium ZIP and copy the folder to where you would like to keep it (and note the path temporarily on a notepad)
-7.2. Or download chrome canary (stable version) (from https://www.google.com/intl/en/chrome/canary/)
-7.2.1. Usually the path to the Chromium executable is: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
+ 7.1. Download and install Chromium (latest version) (from https://download-chromium.appspot.com/)
+  7.1.1. Extract the content of the chromium ZIP and copy the folder to where you would like to keep it (and note the path temporarily on a notepad)
+ 7.2. Or download chrome canary (stable version) (from https://www.google.com/intl/en/chrome/canary/)
+  7.2.1. Usually the path to the Chromium executable is: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
 8. Install NODE.js (from https://nodejs.org/en/download/)
 9. go to the location where Valorant-watcher is located (step 6)
 10. right click anywhere inside the folder (NOT on a file) and select 'Open Command Prompt Here'
