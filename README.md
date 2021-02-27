@@ -33,7 +33,7 @@
 1. Login to your twitch account (www.twitch.tv)
 2. Open inspector(F12 or Ctrl+Shift+I or right click and select 'inspect') on main site
 3. Find the stored cookie section (in the inspect window go to Application > Storage > Cookies > https://www.twitch.tv)
-4. Copy **auth-token** (and temporarily save it in a notepad)
+4. Copy **auth-token** from the location in step 4 (and temporarily save it in a notepad)
 5. Clone this repo (using git, or download the ZIP using https://github.com/D3vl0per/Twitch-watcher/archive/master.zip)
 6. extract the content and copy the folder to where you would like to keep it
 7. install Chromium
