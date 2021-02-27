@@ -39,6 +39,7 @@
 7. install Chromium
 > 7.1. Download and install Chromium (latest version) (from https://download-chromium.appspot.com/)
 >>  7.1.1. Extract the content of the chromium ZIP and copy the folder to where you would like to keep it 
+
 >>  7.1.2. open the chromium folder and press Alt + d , then press ctrl + c, then open a notepad and press ctrl + v
 
 > 7.2. Or download chrome canary (stable version) (from https://www.google.com/intl/en/chrome/canary/)
