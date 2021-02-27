@@ -45,10 +45,12 @@
 >>  7.2.1. Usually the path to the Chromium executable is: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
 8. Install NODE.js (from https://nodejs.org/en/download/)
 9. go to the location where Valorant-watcher is located (step 6)
-10. right click anywhere inside the folder (NOT on a file) and select 'Open Command Prompt Here'
-11. Install the dependencies with `npm install` in the command prompt window
-12. Start the program with `npm start` in the command prompt window
-13. you will be prompted to enter your twitch token and chromium path.
+10. on the keyboard, press Alt + D
+11. type "cmd"
+12. press Enter on the keyboard (command prompt should now open)
+13. Install the dependencies with `npm install` in the command prompt window
+14. Start the program with `npm start` in the command prompt window
+15. you will be prompted to enter your twitch token and chromium path.
 
 ### Linux
 1. Login to your twitch account
